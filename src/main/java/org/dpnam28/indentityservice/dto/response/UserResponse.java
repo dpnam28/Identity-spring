@@ -2,6 +2,7 @@ package org.dpnam28.indentityservice.dto.response;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+import org.dpnam28.indentityservice.entity.Role;
 
 import java.time.LocalDate;
 import java.util.Set;
@@ -17,5 +18,5 @@ public class UserResponse {
     String firstName;
     String lastName;
     LocalDate birth;
-    Set<String> roles;
+    Set<Role> roles;
 }

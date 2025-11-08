@@ -41,9 +41,9 @@ public class UserService {
 
         User user = userMapper.toUser(request);
         user.setPassword(encoder.encode(request.getPassword()));
-        HashSet<String> roles = new HashSet<>();
-        roles.add(Roles.USER.toString());
-        user.setRoles(roles);
+//        HashSet<String> roles = new HashSet<>();
+//        roles.add(Roles.USER.toString());
+//        user.setRoles(roles);
         return ApiResponse.<User>builder()
                 .code(200)
                 .message("Create user successfully")
@@ -79,8 +79,8 @@ public class UserService {
 
     public User updateUser(String id, UserUpdateRequest request) {
         User user = userRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
-        Set<String> roles = request.getRoles();
-        log.info(roles.toString());
+//        Set<String> roles = request.getRoles();
+//        log.info(roles.toString());
         userMapper.updateUser(user, request);
         return userRepository.save(user);
     }

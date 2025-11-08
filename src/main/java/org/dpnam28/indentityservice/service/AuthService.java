@@ -81,7 +81,7 @@ public class AuthService {
                 .subject(user.getUsername())
                 .issuer("identity-service")
                 .issueTime(new Date())
-                .claim("scope", buildScope(user))
+//                .claim("scope", buildScope(user))
                 .expirationTime(new Date(System.currentTimeMillis() + 1000 * 60 * 60))
                 .build();
         JWSObject jwsObject = new JWSObject(new JWSHeader(JWSAlgorithm.HS256), new Payload(claimsSet.toJSONObject()));
@@ -94,9 +94,9 @@ public class AuthService {
         }
     }
 
-    private String buildScope(User user){
-        StringJoiner joiner = new StringJoiner(" ");
-        user.getRoles().forEach(joiner::add);
-        return joiner.toString();
-    }
+//    private String buildScope(User user){
+//        StringJoiner joiner = new StringJoiner(" ");
+//        user.getRoles().forEach(joiner::add);
+//        return joiner.toString();
+//    }
 }

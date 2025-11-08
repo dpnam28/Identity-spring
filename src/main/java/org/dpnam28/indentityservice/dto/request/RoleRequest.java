@@ -2,9 +2,7 @@ package org.dpnam28.indentityservice.dto.request;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-import org.dpnam28.indentityservice.entity.Role;
 
-import java.time.LocalDate;
 import java.util.Set;
 
 @Data
@@ -12,11 +10,8 @@ import java.util.Set;
 @AllArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class UserUpdateRequest {
-    String password;
-    String firstName;
-    String lastName;
-    LocalDate birth;
-    Set<Role> roles;
-
+public class RoleRequest {
+    String name;
+    String description;
+    Set<String> permissions;
 }

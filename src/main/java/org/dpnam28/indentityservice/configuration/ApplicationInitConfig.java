@@ -25,8 +25,8 @@ public class ApplicationInitConfig {
     @Bean
     ApplicationRunner applicationRunner(UserRepository userRepository){
         String password = "admin";
-        Set<String> roles = new HashSet<>();
-        roles.add(Roles.ADMIN.toString());
+//        Set<String> roles = new HashSet<>();
+//        roles.add(Roles.ADMIN.toString());
         return args -> {
             if(userRepository.findByUsername("admin").isEmpty()){
             userRepository.save(User.builder()
@@ -34,7 +34,7 @@ public class ApplicationInitConfig {
                     .password(encoder.encode(password))
                     .firstName("admin")
                     .lastName("admin")
-                    .roles(roles)
+//                    .roles(roles)
                     .build());
             log.info("Admin account created successfully with password: {}", password);
             }

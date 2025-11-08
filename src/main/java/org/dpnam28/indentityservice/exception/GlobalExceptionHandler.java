@@ -2,6 +2,8 @@ package org.dpnam28.indentityservice.exception;
 
 import lombok.extern.slf4j.Slf4j;
 import org.dpnam28.indentityservice.dto.response.ApiResponse;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.authorization.AuthorizationDeniedException;
@@ -56,6 +58,16 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(value = AuthorizationDeniedException.class)
     public ResponseEntity<ApiResponse<?>> handleAuthorizationDeniedException(AuthorizationDeniedException e) {
         ErrorCode errorCode = ErrorCode.USER_NOT_AUTHORIZED;
+        return ResponseEntity.status(errorCode.getCode()).body(apiResponse(errorCode));
+    }
+    @ExceptionHandler(value = InvalidDataAccessApiUsageException.class)
+    public ResponseEntity<ApiResponse<?>> handleInvalidDataAccessApiUsageException(InvalidDataAccessApiUsageException e) {
+        ErrorCode errorCode = ErrorCode.FIELD_NOT_VALID;
+        return ResponseEntity.status(errorCode.getCode()).body(apiResponse(errorCode));
+    }
+    @ExceptionHandler(value = DataIntegrityViolationException.class)
+    public ResponseEntity<ApiResponse<?>> handleDataIntegrityViolationException(DataIntegrityViolationException e) {
+        ErrorCode errorCode = ErrorCode.DATA_INTEGRITY_VIOLATION;
         return ResponseEntity.status(errorCode.getCode()).body(apiResponse(errorCode));
     }
 
