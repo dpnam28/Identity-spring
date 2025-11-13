@@ -7,12 +7,14 @@ import lombok.extern.slf4j.Slf4j;
 import org.dpnam28.indentityservice.dto.request.UserCreationRequest;
 import org.dpnam28.indentityservice.dto.request.UserUpdateRequest;
 import org.dpnam28.indentityservice.dto.response.ApiResponse;
+import org.dpnam28.indentityservice.dto.response.RoleResponse;
 import org.dpnam28.indentityservice.dto.response.UserResponse;
 import org.dpnam28.indentityservice.entity.Role;
 import org.dpnam28.indentityservice.entity.User;
 import org.dpnam28.indentityservice.enums.Roles;
 import org.dpnam28.indentityservice.exception.AppException;
 import org.dpnam28.indentityservice.exception.ErrorCode;
+import org.dpnam28.indentityservice.mapper.RoleMapper;
 import org.dpnam28.indentityservice.mapper.UserMapper;
 import org.dpnam28.indentityservice.repository.RoleRepository;
 import org.dpnam28.indentityservice.repository.UserRepository;
@@ -26,6 +28,7 @@ import org.springframework.stereotype.Service;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -36,8 +39,9 @@ public class UserService {
     UserMapper userMapper;
     PasswordEncoder encoder;
     RoleRepository roleRepository;
+    RoleMapper roleMapper;
 
-    public ApiResponse<User> createUser(UserCreationRequest request) {
+    public ApiResponse<UserResponse> createUser(UserCreationRequest request) {
 
         log.info("Create user service");
 
@@ -46,10 +50,24 @@ public class UserService {
 
         User user = userMapper.toUser(request);
         user.setPassword(encoder.encode(request.getPassword()));
-        return ApiResponse.<User>builder()
+        Set<Role> roles = new HashSet<>();
+        roles.add(Role.builder()
+                .name(Roles.USER.name())
+                .description(Roles.USER.getDescription())
+                .build());
+        user.setRoles(roles);
+        User savedUser = userRepository.save(user);
+        return ApiResponse.<UserResponse>builder()
                 .code(200)
                 .message("Create user successfully")
-                .result(userRepository.save(user))
+                .result(UserResponse.builder()
+                        .id(savedUser.getId())
+                        .username(savedUser.getUsername())
+                        .firstName(savedUser.getFirstName())
+                        .lastName(savedUser.getLastName())
+                        .roles(user.getRoles().stream().map(roleMapper::toRoleResponse).collect(Collectors.toSet()))
+                        .birth(savedUser.getBirth())
+                        .build())
                 .build();
     }
 
@@ -69,7 +87,7 @@ public class UserService {
         return userMapper.toUserResponse(userRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND)));
     }
 
-    public ApiResponse<UserResponse> getMyInfo(){
+    public ApiResponse<UserResponse> getMyInfo() {
         String name = SecurityContextHolder.getContext().getAuthentication().getName();
         return ApiResponse.<UserResponse>builder()
                 .code(200)
