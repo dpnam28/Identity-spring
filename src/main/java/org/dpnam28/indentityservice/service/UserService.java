@@ -8,11 +8,13 @@ import org.dpnam28.indentityservice.dto.request.UserCreationRequest;
 import org.dpnam28.indentityservice.dto.request.UserUpdateRequest;
 import org.dpnam28.indentityservice.dto.response.ApiResponse;
 import org.dpnam28.indentityservice.dto.response.UserResponse;
+import org.dpnam28.indentityservice.entity.Role;
 import org.dpnam28.indentityservice.entity.User;
 import org.dpnam28.indentityservice.enums.Roles;
 import org.dpnam28.indentityservice.exception.AppException;
 import org.dpnam28.indentityservice.exception.ErrorCode;
 import org.dpnam28.indentityservice.mapper.UserMapper;
+import org.dpnam28.indentityservice.repository.RoleRepository;
 import org.dpnam28.indentityservice.repository.UserRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PostAuthorize;
@@ -33,17 +35,17 @@ public class UserService {
     UserRepository userRepository;
     UserMapper userMapper;
     PasswordEncoder encoder;
+    RoleRepository roleRepository;
 
     public ApiResponse<User> createUser(UserCreationRequest request) {
+
+        log.info("Create user service");
 
         if (userRepository.existsUserByUsername(request.getUsername()))
             throw new AppException(ErrorCode.USER_EXISTED);
 
         User user = userMapper.toUser(request);
         user.setPassword(encoder.encode(request.getPassword()));
-//        HashSet<String> roles = new HashSet<>();
-//        roles.add(Roles.USER.toString());
-//        user.setRoles(roles);
         return ApiResponse.<User>builder()
                 .code(200)
                 .message("Create user successfully")
@@ -51,7 +53,7 @@ public class UserService {
                 .build();
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     public ApiResponse<List<UserResponse>> getAllUsers() {
         log.info("Get all users");
         return ApiResponse.<List<UserResponse>>builder()
@@ -77,12 +79,17 @@ public class UserService {
                 .build();
     }
 
-    public User updateUser(String id, UserUpdateRequest request) {
+    public ApiResponse<User> updateUser(String id, UserUpdateRequest request) {
         User user = userRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
-//        Set<String> roles = request.getRoles();
-//        log.info(roles.toString());
         userMapper.updateUser(user, request);
-        return userRepository.save(user);
+        user.setPassword(encoder.encode(request.getPassword()));
+        List<Role> roles = roleRepository.findAllById(request.getRoles());
+        user.setRoles(new HashSet<>(roles));
+        return ApiResponse.<User>builder()
+                .code(200)
+                .message("Update user successfully")
+                .result(userRepository.save(user))
+                .build();
     }
 
     public ApiResponse<?> deleteUser(String id) {

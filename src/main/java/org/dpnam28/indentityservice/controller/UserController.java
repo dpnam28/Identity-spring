@@ -4,6 +4,7 @@ import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
 import org.dpnam28.indentityservice.dto.request.UserCreationRequest;
 import org.dpnam28.indentityservice.dto.request.UserUpdateRequest;
 import org.dpnam28.indentityservice.dto.response.ApiResponse;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@Slf4j
 @RestController
 @RequestMapping("/users")
 @RequiredArgsConstructor
@@ -22,6 +24,7 @@ public class UserController {
     UserService userService;
     @PostMapping
     public ApiResponse<User> createUser(@RequestBody @Valid UserCreationRequest request){
+        log.info("Create user controller");
         return userService.createUser(request);
     }
 
@@ -41,7 +44,7 @@ public class UserController {
     }
 
     @PutMapping("/{id}")
-    public User updateUser(@PathVariable String id, @RequestBody UserUpdateRequest request){
+    public ApiResponse<User> updateUser(@PathVariable String id, @RequestBody UserUpdateRequest request){
     	return userService.updateUser(id, request);
     }
 

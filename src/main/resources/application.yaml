@@ -14,3 +14,5 @@ spring:
 
 jwt:
   secret-key: "0607c62d5434c80e639d4a1805abd5bc961c1b92150c863e6d92fde1e15c1b14"
+  expire-time: 86400
+  refresh-token-expire-time: 172800

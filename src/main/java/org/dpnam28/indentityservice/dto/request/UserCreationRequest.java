@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+import org.dpnam28.indentityservice.validation.BirthConstraint;
 
 import java.time.LocalDate;
 
@@ -23,5 +24,6 @@ public class UserCreationRequest {
     String lastName;
 
     @JsonFormat(pattern = "yyyy-MM-dd")
+    @BirthConstraint(min = 16, message = "INVALID_BIRTH")
     LocalDate birth;
 }

@@ -4,6 +4,7 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.dpnam28.indentityservice.entity.Role;
 import org.dpnam28.indentityservice.entity.User;
 import org.dpnam28.indentityservice.enums.Roles;
 import org.dpnam28.indentityservice.repository.UserRepository;
@@ -25,8 +26,12 @@ public class ApplicationInitConfig {
     @Bean
     ApplicationRunner applicationRunner(UserRepository userRepository){
         String password = "admin";
-//        Set<String> roles = new HashSet<>();
-//        roles.add(Roles.ADMIN.toString());
+        Set<Role> roles = new HashSet<>();
+        Role role  = Role.builder()
+                .name(Roles.ADMIN.name())
+                .description("Admin role")
+                .build();
+        roles.add(role);
         return args -> {
             if(userRepository.findByUsername("admin").isEmpty()){
             userRepository.save(User.builder()
@@ -34,7 +39,7 @@ public class ApplicationInitConfig {
                     .password(encoder.encode(password))
                     .firstName("admin")
                     .lastName("admin")
-//                    .roles(roles)
+                    .roles(roles)
                     .build());
             log.info("Admin account created successfully with password: {}", password);
             }
