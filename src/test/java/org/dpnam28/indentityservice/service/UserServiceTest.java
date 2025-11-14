@@ -18,10 +18,12 @@ import org.mockito.ArgumentMatchers;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import java.time.LocalDate;
+import java.util.Optional;
 import java.util.Set;
 
 @Slf4j
@@ -36,7 +38,7 @@ public class UserServiceTest {
 
     private UserCreationRequest userCreationRequest;
     private User user;
-    private ApiResponse<UserResponse> response;
+    private ApiResponse<UserResponse> response, getMyInfoResponse;
     @Autowired
     private RoleMapper roleMapper;
 
@@ -74,6 +76,17 @@ public class UserServiceTest {
                         .birth(birth)
                         .roles(Set.of(roleMapper.toRoleResponse(roles.iterator().next())))
                         .build()).build();
+        getMyInfoResponse = ApiResponse.<UserResponse>builder()
+                .code(200)
+                .message("Get my info successfully")
+                .result(UserResponse.builder()
+                        .id("cf0600f538b3")
+                        .username("johndoe")
+                        .firstName("John")
+                        .lastName("Doe")
+                        .birth(birth)
+                        .roles(Set.of(roleMapper.toRoleResponse(roles.iterator().next())))
+                        .build()).build();
 
     }
 
@@ -97,5 +110,25 @@ public class UserServiceTest {
         Assertions.assertThatThrownBy(() -> userService.createUser(userCreationRequest))
                 .isInstanceOf(AppException.class)
                 .hasMessage(ErrorCode.USER_EXISTED.getMessage());
+    }
+
+    @Test
+    @WithMockUser(username = "john")
+    void getMyInfo_success() {
+        Mockito.when(userRepository.findByUsername(ArgumentMatchers.any())).thenReturn(Optional.ofNullable(user));
+
+        ApiResponse<UserResponse> serviceResponse = userService.getMyInfo();
+        log.warn(response.toString());
+        log.warn(serviceResponse.toString());
+        Assertions.assertThat(serviceResponse.getCode()).isEqualTo(getMyInfoResponse.getCode());
+        Assertions.assertThat(serviceResponse.getMessage()).isEqualTo(getMyInfoResponse.getMessage());
+        Assertions.assertThat(serviceResponse.getResult()).isEqualTo(getMyInfoResponse.getResult());
+    }
+
+    @Test
+    @WithMockUser(username = "john")
+    void getMyInfo_userNotFound_fail() {
+        Mockito.when(userRepository.findByUsername(ArgumentMatchers.any())).thenReturn(Optional.empty());
+        Assertions.assertThatThrownBy(() -> userService.getMyInfo()).isInstanceOf(AppException.class).hasMessage(ErrorCode.USER_NOT_FOUND.getMessage());
     }
 }

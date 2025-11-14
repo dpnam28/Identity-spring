@@ -84,6 +84,11 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-actuator</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-test</artifactId>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <build>
@@ -121,6 +126,37 @@
                             <version>0.2.0</version>
                         </path>
                     </annotationProcessorPaths>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <version>0.8.12</version>
+                <executions>
+                    <execution>
+                        <id>prepare-agent</id>
+                        <goals>
+                            <goal>prepare-agent</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>report</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>report</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <excludes>
+                        <exclude>org/dpnam28/indentityservice/dto/**</exclude>
+                        <exclude>org/dpnam28/indentityservice/entity/**</exclude>
+                        <exclude>org/dpnam28/indentityservice/mapper/**</exclude>
+                        <exclude>org/dpnam28/indentityservice/configuration/**</exclude>
+                        <exclude>org/dpnam28/indentityservice/enums/**</exclude>
+                        <exclude>org/dpnam28/indentityservice/exception/**</exclude>
+                        <exclude>org/dpnam28/indentityservice/**/*Application.java</exclude>
+                    </excludes>
                 </configuration>
             </plugin>
         </plugins>

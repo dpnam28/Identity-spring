@@ -92,4 +92,5 @@ public class UserControllerTest {
                 .andExpect(MockMvcResultMatchers.jsonPath("code").value("400"))
                 .andExpect(MockMvcResultMatchers.jsonPath("message").value("Username must be at least 5 characters"));
     }
+
 }
